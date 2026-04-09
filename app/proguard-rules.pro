@@ -6,3 +6,6 @@
 -keep class ezvcard.parameter.** {
     <init>(...);
 }
+
+-dontwarn com.andrognito.patternlockview.PatternLockView
+-dontwarn com.andrognito.patternlockview.listener.PatternLockViewListener

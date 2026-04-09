@@ -140,7 +140,11 @@ detekt {
 }
 
 dependencies {
-    implementation(libs.fossify.commons)
+    implementation(libs.fossify.commons) {
+        // This stops fossify.commons from bringing in the old support-library-heavy pattern view
+        exclude(group = "com.github.aritraroy", module = "patternLockView")
+        exclude(group = "com.github.aritraroy.patternLockView", module = "patternlockview")
+    }
     implementation(libs.androidx.swiperefreshlayout)
     implementation(libs.autofittextview)
     implementation(libs.ezvcard)
