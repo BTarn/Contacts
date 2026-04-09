@@ -331,9 +331,14 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
         val phoneNumber = getPhoneNumberFromIntent(intent) ?: ""
         val email = getEmailFromIntent(intent) ?: ""
 
-        Intent().apply {
+        // 1. Change from generic Intent() to targeting your specific Activity
+        // Replace 'EditContactActivity' with the actual name of the activity
+        // in Fossify that handles contact editing/creation.
+        Intent(this, EditContactActivity::class.java).apply {
             action = Intent.ACTION_INSERT
-            data = ContactsContract.Contacts.CONTENT_URI
+
+            // 2. Force it to stay within this app's package
+            setPackage(packageName)
 
             if (phoneNumber.isNotEmpty()) {
                 putExtra(KEY_PHONE, phoneNumber)
@@ -350,6 +355,7 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
             try {
                 startActivityForResult(this, START_INSERT_ACTIVITY)
             } catch (e: ActivityNotFoundException) {
+                // This is unlikely now since we are calling an internal class
                 toast(org.fossify.commons.R.string.no_app_found)
             } catch (e: Exception) {
                 showErrorToast(e)
