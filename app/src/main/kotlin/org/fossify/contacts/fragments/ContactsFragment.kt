@@ -2,7 +2,9 @@ package org.fossify.contacts.fragments
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.util.AttributeSet
+import android.view.View
 import org.fossify.commons.extensions.areSystemAnimationsEnabled
 import org.fossify.commons.extensions.hideKeyboard
 import org.fossify.commons.models.contacts.Contact
@@ -44,27 +46,49 @@ class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPag
     }
 
     fun setupContactsAdapter(contacts: List<Contact>) {
-        setupViewVisibility(contacts.isNotEmpty())
+        // 1. Sort: Favorites at the top, then alphabetical
+        val sortedContacts = contacts.sortedWith(
+            compareByDescending<Contact> { it.starred }
+                .thenBy { it.getNameToDisplay().lowercase() }
+        )
+
+        setupViewVisibility(sortedContacts.isNotEmpty())
         val currAdapter = innerBinding.fragmentList.adapter
 
+        // 2. Add the "Blank Space" Decoration
+        // We remove existing decorations first to prevent spacing from stacking on refresh
+        while (innerBinding.fragmentList.itemDecorationCount > 0) {
+            innerBinding.fragmentList.removeItemDecorationAt(0)
+        }
+
+        innerBinding.fragmentList.addItemDecoration(object : androidx.recyclerview.widget.RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(outRect: Rect, view: View, parent: androidx.recyclerview.widget.RecyclerView, state: androidx.recyclerview.widget.RecyclerView.State) {
+                val position = parent.getChildAdapterPosition(view)
+                if (position == -1 || position >= sortedContacts.size - 1) return
+
+                val currentContact = sortedContacts[position]
+                val nextContact = sortedContacts[position + 1]
+
+                // If this is the last favorite before the regular contacts, add a gap
+                if (currentContact.starred == 1 && nextContact.starred == 0) {
+                    outRect.bottom = 80 // Change this number to adjust the height of the blank space
+                }
+            }
+        })
+
+        // 3. Standard Adapter Logic
         if (currAdapter == null || forceListRedraw) {
             forceListRedraw = false
-            val location = LOCATION_CONTACTS_TAB
-
             ContactsAdapter(
                 activity = activity as SimpleActivity,
-                contactItems = contacts.toMutableList(),
+                contactItems = sortedContacts.toMutableList(),
                 refreshListener = activity as RefreshContactsListener,
-                location = location,
+                location = LOCATION_CONTACTS_TAB,
                 removeListener = null,
                 recyclerView = innerBinding.fragmentList,
                 enableDrag = false,
-                itemClick = {
-                    (activity as RefreshContactsListener).contactClicked(it as Contact)
-                },
-                profileIconClick = {
-                    activity?.viewContact(it as Contact)
-                }
+                itemClick = { (activity as RefreshContactsListener).contactClicked(it as Contact) },
+                profileIconClick = { activity?.viewContact(it as Contact) }
             ).apply {
                 innerBinding.fragmentList.adapter = this
             }
@@ -77,7 +101,7 @@ class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPag
                 startNameWithSurname = context.config.startNameWithSurname
                 showPhoneNumbers = context.config.showPhoneNumbers
                 showContactThumbnails = context.config.showContactThumbnails
-                updateItems(contacts)
+                updateItems(sortedContacts)
             }
         }
     }

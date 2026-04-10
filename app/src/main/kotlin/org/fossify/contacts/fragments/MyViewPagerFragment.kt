@@ -143,6 +143,8 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
             else -> {
                 val contactSources = activity!!.getVisibleContactSources()
                 contacts.filter { contactSources.contains(it.source) }
+                    .sortedWith(compareByDescending<Contact> { it.starred }
+                        .thenBy { it.getNameToDisplay().lowercase() })
             }
         }
 
@@ -268,6 +270,14 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
         innerBinding.letterFastscroller?.setupWithRecyclerView(innerBinding.fragmentList, { position ->
             try {
                 val contact = contacts[position]
+
+                // 1. Check if the contact is a favorite
+                if (contact.starred == 1) {
+                    // Use a Star Emoji or a specific symbol for the whole group
+                    return@setupWithRecyclerView FastScrollItemIndicator.Text("⭐")
+                }
+
+                // 2. If not a favorite, proceed with normal letter logic
                 var name = when {
                     contact.isABusinessContact() -> contact.getFullCompany()
                     sorting and SORT_BY_SURNAME != 0 && contact.surname.isNotEmpty() -> contact.surname
