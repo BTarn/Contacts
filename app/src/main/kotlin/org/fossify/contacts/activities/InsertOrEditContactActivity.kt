@@ -39,8 +39,7 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
     private val binding by viewBinding(ActivityInsertEditContactBinding::inflate)
 
     private val contactsFavoritesList = arrayListOf(
-        TAB_CONTACTS,
-        TAB_FAVORITES
+        TAB_CONTACTS
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,19 +167,6 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
 
     private fun setupTabs() {
         binding.insertEditTabsHolder.removeAllTabs()
-        contactsFavoritesList.forEachIndexed { index, value ->
-            if (config.showTabs and value != 0) {
-                binding.insertEditTabsHolder.newTab().setCustomView(org.fossify.commons.R.layout.bottom_tablayout_item).apply tab@{
-                    customView?.let {
-                        BottomTablayoutItemBinding.bind(it)
-                    }?.apply {
-                        tabItemIcon.setImageDrawable(getTabIcon(index))
-                        tabItemLabel.text = getTabLabel(index)
-                        binding.insertEditTabsHolder.addTab(this@tab)
-                    }
-                }
-            }
-        }
 
         binding.insertEditTabsHolder.onTabSelectionChanged(
             tabUnselectedAction = {
@@ -200,14 +186,14 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
         return if (binding.viewPager.currentItem == 0) {
             findViewById(R.id.contacts_fragment)
         } else {
-            findViewById(R.id.favorites_fragment)
+            findViewById(R.id.groups_fragment)
         }
     }
 
     private fun getAllFragments(): ArrayList<MyViewPagerFragment<*>?> {
         return arrayListOf<MyViewPagerFragment<*>?>(
             findViewById(R.id.contacts_fragment),
-            findViewById(R.id.favorites_fragment)
+            findViewById(R.id.groups_fragment)
         )
     }
 
@@ -269,19 +255,11 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
                 else -> null
             }
 
-            if (refreshTabsMask and TAB_CONTACTS != 0) {
-                findViewById<MyViewPagerFragment<*>>(R.id.contacts_fragment)?.apply {
+            findViewById<MyViewPagerFragment<*>>(R.id.contacts_fragment)?.apply {
                     skipHashComparing = true
                     refreshContacts(contacts, placeholderText)
-                }
             }
 
-            if (refreshTabsMask and TAB_FAVORITES != 0) {
-                findViewById<MyViewPagerFragment<*>>(R.id.favorites_fragment)?.apply {
-                    skipHashComparing = true
-                    refreshContacts(contacts, placeholderText)
-                }
-            }
         }
     }
 
@@ -378,9 +356,6 @@ class InsertOrEditContactActivity : SimpleActivity(), RefreshContactsListener {
 
     private fun getTabsMask(): Int {
         var mask = TAB_CONTACTS
-        if (config.showTabs and TAB_FAVORITES != 0) {
-            mask += TAB_FAVORITES
-        }
         return mask
     }
 }

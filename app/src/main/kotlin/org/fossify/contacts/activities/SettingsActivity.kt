@@ -15,7 +15,6 @@ import org.fossify.contacts.databinding.ActivitySettingsBinding
 import org.fossify.contacts.dialogs.ExportContactsDialog
 import org.fossify.contacts.dialogs.ManageAutoBackupsDialog
 import org.fossify.contacts.dialogs.ManageVisibleFieldsDialog
-import org.fossify.contacts.dialogs.ManageVisibleTabsDialog
 import org.fossify.contacts.extensions.*
 import org.fossify.contacts.helpers.VcfExporter
 import java.io.OutputStream
@@ -45,7 +44,6 @@ class SettingsActivity : SimpleActivity() {
 
         setupCustomizeColors()
         setupManageShownContactFields()
-        setupManageShownTabs()
         setupFontSize()
         setupUseEnglish()
         setupLanguage()
@@ -90,18 +88,11 @@ class SettingsActivity : SimpleActivity() {
         }
     }
 
-    private fun setupManageShownTabs() {
-        binding.settingsManageShownTabsHolder.setOnClickListener {
-            ManageVisibleTabsDialog(this)
-        }
-    }
-
     private fun setupDefaultTab() {
         binding.settingsDefaultTab.text = getDefaultTabText()
         binding.settingsDefaultTabHolder.setOnClickListener {
             val items = arrayListOf(
                 RadioItem(TAB_CONTACTS, getString(org.fossify.commons.R.string.contacts_tab)),
-                RadioItem(TAB_FAVORITES, getString(org.fossify.commons.R.string.favorites_tab)),
                 RadioItem(TAB_GROUPS, getString(org.fossify.commons.R.string.groups_tab)),
                 RadioItem(TAB_LAST_USED, getString(org.fossify.commons.R.string.last_used_tab))
             )
@@ -116,7 +107,6 @@ class SettingsActivity : SimpleActivity() {
     private fun getDefaultTabText() = getString(
         when (baseConfig.defaultTab) {
             TAB_CONTACTS -> org.fossify.commons.R.string.contacts_tab
-            TAB_FAVORITES -> org.fossify.commons.R.string.favorites_tab
             TAB_GROUPS -> org.fossify.commons.R.string.groups_tab
             else -> org.fossify.commons.R.string.last_used_tab
         }

@@ -1,7 +1,6 @@
 package org.fossify.contacts.helpers
 
 import org.fossify.commons.helpers.TAB_CONTACTS
-import org.fossify.commons.helpers.TAB_FAVORITES
 import org.fossify.commons.helpers.TAB_GROUPS
 import org.joda.time.DateTime
 
@@ -30,10 +29,9 @@ const val LOCATION_INSERT_OR_EDIT = 3
 
 val tabsList = arrayListOf(
     TAB_CONTACTS,
-    TAB_FAVORITES,
     TAB_GROUPS
 )
-const val ALL_TABS_MASK = TAB_CONTACTS or TAB_FAVORITES or TAB_GROUPS
+const val ALL_TABS_MASK = TAB_CONTACTS or TAB_GROUPS
 
 // phone number/email types
 const val CELL = "CELL"

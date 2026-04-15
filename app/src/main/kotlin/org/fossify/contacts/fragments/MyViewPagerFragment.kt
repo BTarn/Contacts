@@ -69,12 +69,6 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
                     innerBinding.fragmentFab.contentDescription = activity.getString(org.fossify.commons.R.string.create_new_contact)
                 }
 
-                is FavoritesFragment -> {
-                    innerBinding.fragmentPlaceholder.text = activity.getString(R.string.no_favorites)
-                    innerBinding.fragmentPlaceholder2.text = activity.getString(org.fossify.commons.R.string.add_favorites)
-                    innerBinding.fragmentFab.contentDescription = activity.getString(org.fossify.commons.R.string.add_favorites)
-                }
-
                 is GroupsFragment -> {
                     innerBinding.fragmentPlaceholder.text = activity.getString(R.string.no_group_created)
                     innerBinding.fragmentPlaceholder2.text = activity.getString(R.string.create_group)
@@ -107,14 +101,13 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
         if (this !is GroupsFragment) {
             (innerBinding.fragmentList.adapter as? ContactsAdapter)?.apply {
                 config.sorting = if (startNameWithSurname) SORT_BY_SURNAME else SORT_BY_FIRST_NAME
-                (this@MyViewPagerFragment.activity!! as MainActivity).refreshContacts(TAB_CONTACTS or TAB_FAVORITES)
+                (this@MyViewPagerFragment.activity!! as MainActivity).refreshContacts(TAB_CONTACTS)
             }
         }
     }
 
     fun refreshContacts(contacts: ArrayList<Contact>, placeholderText: String? = null) {
         if ((config.showTabs and TAB_CONTACTS == 0 && this is ContactsFragment && activity !is InsertOrEditContactActivity) ||
-            (config.showTabs and TAB_FAVORITES == 0 && this is FavoritesFragment) ||
             (config.showTabs and TAB_GROUPS == 0 && this is GroupsFragment)
         ) {
             return
@@ -128,17 +121,6 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
         allContacts = contacts
         val filtered = when (this) {
             is GroupsFragment -> contacts
-            is FavoritesFragment -> {
-                val contactSources = activity!!.getVisibleContactSources()
-                val favouriteContacts = contacts
-                    .filter { it.starred == 1 && contactSources.contains(it.source) }
-
-                if (activity!!.config.isCustomOrderSelected) {
-                    sortFavourites(favouriteContacts)
-                } else {
-                    favouriteContacts
-                }
-            }
 
             else -> {
                 val contactSources = activity!!.getVisibleContactSources()
@@ -189,13 +171,6 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
                 setupGroupsAdapter(contacts) {
                     groupsIgnoringSearch = (innerBinding.fragmentList.adapter as? GroupsAdapter)?.groups ?: ArrayList()
                 }
-            }
-
-            is FavoritesFragment -> {
-                setupContactsFavoritesAdapter(contacts)
-                contactsIgnoringSearch = (innerBinding.fragmentList.adapter as? ContactsAdapter)?.contactItems ?: listOf()
-                setupLetterFastscroller(contacts)
-                innerBinding.letterFastscrollerThumb.setupWithFastScroller(innerBinding.letterFastscroller)
             }
 
             is ContactsFragment -> {
@@ -342,12 +317,6 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
                 !getProperText(nameToDisplay, shouldNormalize).startsWith(fixedText, true) && !nameToDisplay.contains(fixedText, true)
             }
 
-            if (filtered.isEmpty() && this@MyViewPagerFragment is FavoritesFragment) {
-                if (innerBinding.fragmentPlaceholder.tag != AVOID_CHANGING_TEXT_TAG) {
-                    innerBinding.fragmentPlaceholder.text = activity?.getString(org.fossify.commons.R.string.no_contacts_found)
-                }
-            }
-
             innerBinding.fragmentPlaceholder.beVisibleIf(filtered.isEmpty())
             adapter.updateItems(filtered, fixedText.normalizeString())
             setupLetterFastscroller(filtered)
@@ -375,9 +344,6 @@ abstract class MyViewPagerFragment<Binding : MyViewPagerFragment.InnerBinding>(c
             setupViewVisibility(groupsIgnoringSearch.isNotEmpty())
         }
 
-        if (this is FavoritesFragment && innerBinding.fragmentPlaceholder.tag != AVOID_CHANGING_TEXT_TAG) {
-            innerBinding.fragmentPlaceholder.text = activity?.getString(R.string.no_favorites)
-        }
     }
 
     fun setupViewVisibility(hasItemsToShow: Boolean) {

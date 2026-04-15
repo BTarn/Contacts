@@ -66,11 +66,11 @@ open class SimpleActivity : BaseSimpleActivity() {
     }
 
     protected fun getTabIcon(position: Int): Drawable {
-        val drawableId = when (position) {
-            LOCATION_CONTACTS_TAB -> org.fossify.commons.R.drawable.ic_person_vector
-            LOCATION_FAVORITES_TAB -> org.fossify.commons.R.drawable.ic_star_vector
-            else -> org.fossify.commons.R.drawable.ic_people_vector
-        }
+        val drawableId = org.fossify.commons.R.drawable.ic_person_vector
+//        val drawableId = when (position) {
+//            LOCATION_CONTACTS_TAB -> org.fossify.commons.R.drawable.ic_person_vector
+//            else -> org.fossify.commons.R.drawable.ic_people_vector
+//        }
 
         return resources.getColoredDrawableWithColor(drawableId, getProperTextColor())
     }
@@ -78,7 +78,6 @@ open class SimpleActivity : BaseSimpleActivity() {
     protected fun getTabLabel(position: Int): String {
         val stringId = when (position) {
             LOCATION_CONTACTS_TAB -> org.fossify.commons.R.string.contacts_tab
-            LOCATION_FAVORITES_TAB -> org.fossify.commons.R.string.favorites_tab
             else -> org.fossify.commons.R.string.groups_tab
         }
 

@@ -75,7 +75,7 @@ class ContactsFragment(context: Context, attributeSet: AttributeSet) : MyViewPag
                 // If this is the last favorite before the regular contacts, add a gap
                 if (currentContact.starred == 1 && nextContact.starred == 0) {
                     outRect.bottom = 80 // Change this number to adjust the height of the blank space
-                } else if (currentLetter != nextLetter) {
+                } else if (currentContact.starred == 0 && nextContact.starred == 0 && currentLetter != nextLetter) {
                     outRect.bottom = 48 // Add a small space between different leading alphabets
                 }
             }

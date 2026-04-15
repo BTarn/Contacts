@@ -6,7 +6,6 @@ import androidx.viewpager.widget.PagerAdapter
 import org.fossify.commons.extensions.getProperPrimaryColor
 import org.fossify.commons.extensions.getProperTextColor
 import org.fossify.commons.helpers.TAB_CONTACTS
-import org.fossify.commons.helpers.TAB_FAVORITES
 import org.fossify.commons.helpers.TAB_GROUPS
 import org.fossify.contacts.R
 import org.fossify.contacts.activities.SimpleActivity
@@ -37,17 +36,10 @@ class ViewPagerAdapter(val activity: SimpleActivity, val currTabsList: ArrayList
 
     private fun getFragment(position: Int): Int {
         val fragments = arrayListOf<Int>()
-        if (showTabs and TAB_CONTACTS != 0) {
             fragments.add(R.layout.fragment_contacts)
-        }
 
-        if (showTabs and TAB_FAVORITES != 0) {
-            fragments.add(R.layout.fragment_favorites)
-        }
-
-        if (showTabs and TAB_GROUPS != 0) {
             fragments.add(R.layout.fragment_groups)
-        }
+
 
         return fragments[position]
     }
